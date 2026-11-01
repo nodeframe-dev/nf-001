@@ -24,7 +24,6 @@ def search_entities(query, df_geo):
     results = []
     seen = set()
 
-    # CITE/UT: coincidencias exactas primero y luego parciales.
     for _, row in df_geo.iterrows():
         name = str(row.get("nombre_cite", ""))
         key = normalize_text(name)
@@ -40,7 +39,6 @@ def search_entities(query, df_geo):
                 })
                 seen.add(item_key)
 
-    # Regiones.
     for region in df_geo["region_cite"].dropna().astype(str).unique():
         key = normalize_text(region)
         if q in key:
