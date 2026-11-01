@@ -14,8 +14,6 @@ def _feature_region(props):
 
 def create_map(df_geo, geojson_data, selected_region=None, selected_cite=None):
     center = [-9.19, -75.0152]
-    # Vista nacional ajustada para que el Perú aproveche mejor el alto del mapa.
-    # Leaflet admite zoom fraccionario mediante zoomSnap.
     zoom = 5.5
     if selected_region:
         subset = df_geo[df_geo["_region_key"] == normalize_text(selected_region)]
@@ -47,7 +45,6 @@ def create_map(df_geo, geojson_data, selected_region=None, selected_cite=None):
                 return {"fillColor":"#60A5FA","color":"#FFFFFF","weight":1.1,"fillOpacity":0.50}
             return {"fillColor":"#D1D5DB","color":"#FFFFFF","weight":1.0,"fillOpacity":0.48}
 
-        # El tooltip se construye sin depender de un nombre de campo específico.
         for feature in geojson_data["features"]:
             feature.setdefault("properties", {})["_display_region"] = _feature_region(feature.get("properties", {}))
 
@@ -59,8 +56,6 @@ def create_map(df_geo, geojson_data, selected_region=None, selected_cite=None):
             tooltip=folium.GeoJsonTooltip(fields=["_display_region"], aliases=["Región:"]),
         ).add_to(m)
 
-        # Ajusta el encuadre a la geometría real del Perú (o a la región seleccionada),
-        # evitando mostrar grandes extensiones de países vecinos.
         features_to_fit = geojson_data["features"]
         if selected_key:
             selected_features = [
@@ -83,9 +78,6 @@ def create_map(df_geo, geojson_data, selected_region=None, selected_cite=None):
         for feature in features_to_fit:
             collect_coords(feature.get("geometry", {}).get("coordinates", []))
         if lats and lons and selected_key:
-            # Para una región sí usamos sus límites reales. En la vista nacional
-            # conservamos el zoom 5.75 para que el Perú llene mejor el alto del
-            # visor y no quede rodeado por demasiado territorio vecino.
             m.fit_bounds(
                 [[min(lats), min(lons)], [max(lats), max(lons)]],
                 padding=(8, 8),
