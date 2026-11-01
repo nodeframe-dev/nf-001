@@ -44,8 +44,6 @@ def load_data():
     df_geo["_region_key"] = df_geo["region_cite"].map(normalize_text)
     df_tem["_cite_key"] = df_tem["CITE"].map(normalize_text)
 
-    # La cartografía departamental se consume directamente desde GitHub RAW.
-    # El resultado queda cacheado junto con el resto de los datos por @st.cache_data.
     geojson_data = None
     geojson_source = None
     try:
@@ -58,8 +56,7 @@ def load_data():
             geojson_data = json.loads(response.read().decode("utf-8"))
         geojson_source = "GitHub RAW"
     except Exception:
-        # La app puede seguir mostrando los CITE/UT mediante sus coordenadas,
-        # aunque la capa de polígonos regionales no esté disponible.
+
         geojson_data = None
         geojson_source = None
 
