@@ -56,8 +56,6 @@ def reset_peru_view():
     st.session_state.search_selector = None
     st.session_state.search_version += 1
 
-# Opciones del buscador. El selectbox de Streamlit permite escribir para filtrar
-# y muestra las coincidencias en un menú flotante, sin empujar el mapa hacia abajo.
 search_options = []
 
 for reg in sorted(df_geo["region_cite"].dropna().astype(str).unique(), key=normalize_text):
@@ -96,7 +94,6 @@ def apply_search_selection():
         st.session_state.selected_region = result["value"]
         st.session_state.selected_cite = None
 
-    # Después de aplicar el resultado, el buscador vuelve a quedar vacío.
     st.session_state.search_query = ""
     st.session_state.search_selector = None
 
@@ -139,9 +136,6 @@ with map_col:
         returned_objects=["last_object_clicked"],
     )
 
-    # El clic sobre cualquier punto de un polígono regional selecciona esa región.
-    # streamlit-folium devuelve la latitud/longitud del clic; luego se identifica
-    # el departamento mediante su geometría GeoJSON real.
     clicked = (map_state or {}).get("last_object_clicked")
     if clicked and geojson_data:
         click_signature = (clicked.get("lat"), clicked.get("lng"))
@@ -155,9 +149,6 @@ with map_col:
                 != normalize_text(st.session_state.selected_region)
             )
 
-            # El menú de búsqueda puede estar abierto aunque todavía no haya una
-            # opción seleccionada. Al hacer clic en el mapa forzamos una nueva
-            # instancia del buscador para cerrarlo y dejarlo limpio.
             st.session_state.search_selector = None
             st.session_state.search_version += 1
 
@@ -165,8 +156,6 @@ with map_col:
                 st.session_state.selected_region = clicked_region
                 st.session_state.selected_cite = None
 
-            # El rerun remonta el buscador con una clave nueva y cierra cualquier
-            # menú de coincidencias que hubiera quedado abierto.
             st.rerun()
 
     if geojson_data is None:
@@ -211,8 +200,6 @@ with panel_col:
                     st.caption("Sin servicios o áreas temáticas registradas.")
                     continue
 
-                # Mostrar solo los servicios existentes para el CITE, pero siempre
-                # respetando el orden institucional. Los nombres se muestran sin 01, 02, etc.
                 service_order = cite_services["TIPO DE SERVICIO"].dropna().drop_duplicates().tolist()
                 service_order = sorted(
                     service_order,
