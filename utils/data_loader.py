@@ -46,19 +46,20 @@ def load_data():
 
     geojson_data = None
     geojson_source = None
-    try:
-        import urllib.request
-        request = urllib.request.Request(
-            GEOJSON_URL,
-            headers={"User-Agent": "Mapa-Tematicas-Red-CITE/1.0"},
-        )
-        with urllib.request.urlopen(request, timeout=20) as response:
-            geojson_data = json.loads(response.read().decode("utf-8"))
-        geojson_source = "GitHub RAW"
-    except Exception:
+    local_geojson = DATA_DIR / "peru_departamentos.geojson"
+    if local_geojson.exists():
+        try:
+            with local_geojson.open("r", encoding="utf-8") as fh:
+                candidate = json.load(fh)
+            if candidate.get("type") != "FeatureCollection" or not candidate.get("features"):
+                raise ValueError("El GeoJSON no contiene una colección de departamentos válida.")
+            geojson_data = candidate
+            geojson_source = "Local"
+        except (OSError, ValueError, TypeError) as exc:
+            geojson_source = f"Error en GeoJSON local: {exc}"
+    else:
+        geojson_source = "No se encontró data/peru_departamentos.geojson"
 
-        geojson_data = None
-        geojson_source = None
 
     return df_geo, df_tem, geojson_data, geojson_source
 
