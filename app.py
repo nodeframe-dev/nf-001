@@ -159,7 +159,7 @@ with map_col:
             st.rerun()
 
     if geojson_data is None:
-        st.caption("El mapa muestra los CITE/UT por coordenadas. Agrega data/peru_departamentos.geojson para visualizar los límites regionales sin depender de Internet.")
+        st.warning(f"Límites departamentales no disponibles: {geojson_source}. Los marcadores siguen funcionando, pero la selección por polígono y el sombreado están deshabilitados.")
 
 with panel_col:
     selected_region = st.session_state.selected_region
